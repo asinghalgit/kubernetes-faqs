@@ -148,8 +148,17 @@ No resources found in default namespace
 
 - The proxy can be terminated by pressing control-C and won't show any output while its running.
 
--  The API server will automatically create an endpoint for each pod, based on the pod name, that is also accessible through the proxy.
+- The API server will automatically create an endpoint for each pod, based on the pod name, that is also accessible through the proxy.
 
+- Once we create proxy then just get name of the pod which you want to access and curl api endpoint as follows:
+
+  `export POD_NAME=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')`
+  
+  `echo Name of the Pod: $POD_NAME`
+  
+  `curl http://<kube proxy server>:<kube proxy port>/api/v1/namespaces/default/pods/$POD_NAME/proxy/`
+  
+  
 ##### What is the context of Nodes in kubernetes cluster?
 ![screenshot14](screenshot14.PNG)
 ![screenshot15](screenshot15.PNG)
@@ -163,6 +172,29 @@ Following command can tell more details around node:
 For example - describe command displays extensive details for a resource which in this case is Pod. 
 ![screenshot17](screenshot17.PNG)
 
+##### How to export/save a variable to use that variable later? Please give an example:
+
+`export NODE_PORT=$(kubectl get services/kubernetes-bootcamp -o go-template='{{(index .spec.ports 0).nodePort}}')`
+
+`echo NODE_PORT=$NODE_PORT`
+
+##### How to view container logs running inside pod?
+
+![screenshot26](screenshot26.PNG)
+
+##### Give an example of executing command inside container running in pod.
+
+- Let’s list the environment variables:
+
+![screenshot27](screenshot27.PNG)
+
+- start a bash session in the Pod’s container:
+
+![screenshot28](screenshot28.PNG)
+
+- run more commands in the Pod’s container:
+
+![screenshot29](screenshot29.PNG)
 
 ##### what could be problems when Pods die?
 ![screenshot18](screenshot18.PNG)
@@ -171,8 +203,13 @@ For example - describe command displays extensive details for a resource which i
 - Although each Pod has a unique IP address, those IPs are not exposed outside the cluster without a Service.
 - Services allow your applications to receive traffic
 - Services enable a loose coupling between dependent Pods.
+- A Service routes traffic across a set of Pods.
+- Service allow pods to die and replicate in Kubernetes without impacting your application. 
+- Discovery and routing among dependent Pods (such as the frontend and backend components in an application) is handled by Kubernetes Services.
+- Services match a set of Pods using labels and selectors
 
-##### is there any default service which gets created when we start kubernetes cluster via minikube start?4
+
+##### is there any default service which gets created when we start kubernetes cluster via minikube start?
 Following service gets created by default:
 ![screenshot19](screenshot19.PNG)
 ![screenshot20](screenshot20.PNG)
@@ -185,6 +222,7 @@ by creating new service
 
 ##### Which commands/steps can be used to create a new service?
 - To create a new service and expose it to external traffic, use the expose command with NodePort as parameter.
+
 `kubectl expose deployment/kubernetes-bootcamp --type="NodePort" --port 8080`
 
 ![screenshot22](screenshot22.PNG)
@@ -195,11 +233,192 @@ by creating new service
 
 ![screenshot25](screenshot25.PNG)
 
-##### How to export/save a variable to use that variable later? Please give an example:
+##### List down sequence of steps to better understand connection between deployment -> pod -> Node -> service -> cluster
+![screenshot35](screenshot35.PNG)
 
-`export NODE_PORT=$(kubectl get services/kubernetes-bootcamp -o go-template='{{(index .spec.ports 0).nodePort}}')`
+![screenshot30](screenshot30.PNG)
 
-`echo NODE_PORT=$NODE_PORT`
+![screenshot31](screenshot31.PNG)
+
+![screenshot32](screenshot32.PNG)
+![screenshot33](screenshot33.PNG)
+
+![screenshot34](screenshot34.PNG)
+
+![screenshot36](screenshot36.PNG)
+
+##### What is the context of using labels in kubernetes objects?
+- Labels are key/value pairs attached to objects and can be used in any number of ways.
+- can be used to designate objects for development, test, and production
+- can be used to embed version tags
+- can be used to classify an object using tags
+
+##### When labels can be created for kubernetes objects?
+Labels can be attached to objects at creation time or later on. They can be modified at any time.
+
+##### Give an example of how to view and apply labels to kubernetes objects.
+
+![screenshot37](screenshot37.PNG)
+![screenshot38](screenshot38.PNG)
+![screenshot39](screenshot39.PNG)
+![screenshot40](screenshot40.PNG)
+![screenshot41](screenshot41.PNG)
+
+- The Deployment created automatically a label for our Pod.
+- get list of pods attached with above label by following command
+
+```
+kubectl describe deployment
+kubectl get pods -l run=kubernetes-bootcamp
+kubectl get services -l run=kubernetes-bootcamp
+export POD_NAME=$(kubectl get pods -o go-template --template '{{range .items}}{{.metadata.name}}{{"\n"}}{{end}}')
+echo Name of the Pod: $POD_NAME
+kubectl label pod $POD_NAME app=v1
+kubectl describe pods $POD_NAME
+kubectl get pods -l app=v1
+```
+
+![screenshot42](screenshot42.PNG)
+
+![screenshot43](screenshot43.PNG)
+
+![screenshot44](screenshot44.PNG)
+
+##### Is there a way to delete Kubernetes service. If yes then how?
+
+```
+kubectl delete service -l run=kubernetes-bootcamp
+kubectl get services
+curl $(minikube ip):$NODE_PORT
+kubectl exec -ti $POD_NAME curl localhost:8080
+```
+
+##### What does it mean when kubernetes service is deleted?
+Application will not be reachable anymore from outside of the cluster.
+
+##### Is it that when a service is deleted then application will go down?
+No, it only means that application will not be reachable outside kubernetes cluster.
+
+##### what is the way to shut down application?
+To shut down the application, you would need to delete the Deployment as well.
+
+##### what is the context of scaling an application?
+so far
+- we created a Deployment, and then exposed it publicly via a Service. 
+- The Deployment created only one Pod for running our application. 
+- When traffic increases, we will need to scale the application to keep up with user demand.
+
+##### what is the way to scale an application?
+- Scaling is accomplished by changing the number of replicas in a Deployment.
+- Scaling out a Deployment will ensure new Pods are created and scheduled to Nodes with available resources. Scaling will increase the number of Pods to the new desired state.
+- Scaling to zero is also possible, and it will terminate all Pods of the specified Deployment.
+
+#### Does kubernetes support autoscaling of pods?
+Yes, Kubernetes also supports autoscaling of Pods.
+
+#### How traffic will be routed if multiple instances of same pod are running?
+- Running multiple instances of an application will require a way to distribute the traffic to 
+all of them. Services have an integrated load-balancer that will distribute network traffic 
+to all Pods of an exposed Deployment. Services will monitor continuously the running Pods 
+using endpoints, to ensure the traffic is sent only to available Pods.
+
+- Once you have multiple instances of an Application running, you would be able to do 
+Rolling updates without downtime.
+
+#### Please explain in detail what all attributes meaning is in `kubectl get deployments` command.
+![screenshot45](screenshot45.PNG)
+![screenshot46](screenshot46.PNG)
+
+##### How to check replica set created by create deployment step?
+![screenshot47](screenshot47.PNG)
+![screenshot48](screenshot48.PNG)
+
+##### How to scale application instances?
+```
+kubectl get deployments
+kubectl get rs
+kubectl scale deployments/kubernetes-bootcamp --replicas=4
+kubectl get deployments
+kubectl get pods -o wide
+kubectl describe deployments/kubernetes-bootcamp
+```
+
+In similar fashion, application instances can be scaled down.
+
+![screenshot49](screenshot49.PNG)
+
+##### What is the concept of rolling updates?
+![screenshot50](screenshot50.PNG)
+
+![screenshot51](screenshot51.PNG)
+
+![screenshot52](screenshot52.PNG)
+
+![screenshot53](screenshot53.PNG)
+
+![screenshot54](screenshot54.PNG)
+
+![screenshot55](screenshot55.PNG)
+
+##### What is the benefit of performing rolling updates?
+![screenshot56](screenshot56.PNG)
+
+##### How to update docker image version?
+- use the set image command, followed by the deployment name and the new image version:
+```
+kubectl set image deployments/kubernetes-bootcamp kubernetes-bootcamp=jocatalin/kubernetes-bootcamp:v2
+```
+
+- The update can be confirmed also by running a rollout status command
+```
+kubectl rollout status deployments/kubernetes-bootcamp
+```
+
+##### Which command can be used to roll back to previous version?
+```
+kubectl rollout undo deployments/kubernetes-bootcamp
+```
+
+##### How to set up minikube on Google cloud platform?
+- install docker
+- install minikube (link - https://minikube.sigs.k8s.io/docs/start/ and https://minikube.sigs.k8s.io/docs/drivers/)
+- install kubectl 
+- after installing minikube and kubectl, verify by using commands `minikube version` and `kubectl`
+
+##### Please give an example of deploying simple sprint boot app (i.e. with one endpoint /hello) in kubernetes cluster.
+- Using spring initializer, build spring boot app
+- Expose one endpoint with url, for example - /hello which returns "hello, anshul"
+- build this app using maven so that in target folder, application jar file gets generated
+- create Dockerfile with above jar 
+- build docker image
+- test this docker image if end point is working correctly
+- push this image in docker hub
+- check if pod is running
+- create kubernetes deployment
+- expose kubernetes service
+- access application url via kubernetes cluster ip and node port
+
+![screenshot57](screenshot57.PNG)
+
+![screenshot58](screenshot58.PNG)
+
+##### what will happen if image referred in `create deployment` step is not present in docker hub or unable to pull image from docker hub?
+Pod will not come up. It could be checked by `kubectl get pods` command where current state and desired state will not match.
+Also status will be pending.
+
+![screenshot59](screenshot59.PNG)
+
+##### what is the way to tell kubernetes cluster to always download image from local machine where kubernetes cluster is running?
+![screenshot60](screenshot60.PNG)
+Overall
+- use docker daemon of minikube
+- build image using above docker daemon
+- set imagepullpolicy to never
+- create deployment
+
+
+
+
 
 
 
