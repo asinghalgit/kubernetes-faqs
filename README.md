@@ -2,6 +2,7 @@
 
 ##### References
 - https://kubernetes.io/docs/tutorials/kubernetes-basics/create-cluster/cluster-intro/
+- https://kubernetes.io/docs/concepts/overview/components/
 
 ##### Why to use Kubernetes?
 With modern web services, users expect applications to be available 24/7, and developers expect to deploy new versions of those applications several times a day. Containerization helps package software to serve these goals, enabling applications to be released and updated without downtime. Kubernetes helps you make sure those containerized applications run where and when you want, and helps them find the resources and tools they need to work. Kubernetes is a production-ready, open source platform designed with Google's accumulated experience in container orchestration, combined with best-of-breed ideas from the community.
@@ -29,8 +30,54 @@ With modern web services, users expect applications to be available 24/7, and de
 
 ![screenshot3](screenshot3.PNG)
 
-##### what is minikube?
+![screenshot61](screenshot61.PNG)
 
+- When you deploy Kubernetes, you get a cluster.
+- Every cluster has at least one worker node.
+- A Kubernetes cluster consists of a set of worker machines, called nodes, that run containerized applications. 
+- The worker node(s) host the Pods that are the components of the application workload.
+-  The control plane manages the worker nodes and the Pods in the cluster.
+
+##### what is special about cluster configuration in production environment?
+In production environments, the control plane usually runs across multiple computers and a cluster usually runs multiple nodes, providing fault-tolerance and high availability.
+
+##### Control plane components are responsible primarily for which job?
+![screenshot62](screenshot62.PNG)
+
+##### API server is responsible primarily for which job?
+- exposes the Kubernetes API
+- The API server is the front end for the Kubernetes control plane.
+- The main implementation of a Kubernetes API server is kube-apiserver
+- kube-apiserver is designed to scale horizontally. that is, it scales by deploying more instances. 
+- You can run several instances of kube-apiserver and balance traffic between those instances.
+
+##### etcd is responsible primarily for which job?
+- Consistent and highly-available key value store used as Kubernetes' backing store for all cluster data.
+- If your Kubernetes cluster uses etcd as its backing store, make sure you have a back up plan for those data.
+
+##### kube-scheduler is responsible primarily for which job?
+- watches for newly created Pods with no assigned node, and selects a node for them to run on.
+- Factors taken into account for scheduling decisions include: individual and collective resource requirements, hardware/software/policy constraints, affinity and anti-affinity specifications, data locality, inter-workload interference, and deadlines
+
+##### kube-controller-manager is responsible primarily for which job?
+![screenshot63](screenshot63.PNG)
+
+##### kubelet is responsible primarily for which job?
+![screenshot64](screenshot64.PNG)
+
+##### kube-proxy is responsible primarily for which job?
+![screenshot65](screenshot65.PNG)
+
+##### Web UI dashboard is responsible primarily for which job?
+![screenshot66](screenshot66.PNG)
+
+##### Container Resource Monitoring is responsible primarily for which job?
+Container Resource Monitoring records generic time-series metrics about containers in a central database, and provides a UI for browsing that data.
+
+##### Cluster-level Logging is responsible primarily for which job?
+A cluster-level logging mechanism is responsible for saving container logs to a central log store with search/browsing interface.
+
+##### what is minikube?
 Refer link - https://minikube.sigs.k8s.io/docs/start/
 - minikube is local Kubernetes, focusing on making it easy to learn and develop for Kubernetes.
 
