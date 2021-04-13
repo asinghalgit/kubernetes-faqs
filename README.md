@@ -81,6 +81,16 @@ A cluster-level logging mechanism is responsible for saving container logs to a 
 Refer link - https://minikube.sigs.k8s.io/docs/start/
 - minikube is local Kubernetes, focusing on making it easy to learn and develop for Kubernetes.
 
+##### Which are the key points common for all kubernetes objects?
+- persistent entities in the Kubernetes system.
+- represent the state of your cluster
+- once you create the object, the Kubernetes system will constantly work to ensure that object exists.
+- To work with Kubernetes objects--whether to create, modify, or delete them--you'll need to use the Kubernetes API.
+- When you use the kubectl command-line interface, for example, the CLI makes the necessary Kubernetes API calls for you.
+- You can also use the Kubernetes API directly in your own programs using one of the Client Libraries.
+- When you use the Kubernetes API to create the object (either directly or via kubectl), that API request must 
+include that information as JSON in the request body. Most often, you provide the information to kubectl in a 
+.yaml file. kubectl converts the information to JSON when making the API request.
 
 ##### which are the various commands we ran during this exercise?
 
@@ -463,13 +473,76 @@ Overall
 - set imagepullpolicy to never
 - create deployment
 
+##### Give an example of creating deployment via yaml file.
+![screenshot67](screenshot67.PNG)
 
+```
+kubectl apply -f https://k8s.io/examples/application/deployment.yaml --record
+```
 
+![screenshot68](screenshot68.PNG)
 
+##### What is object name all about?
+- Each object in your cluster has a Name that is unique for that type of resource within same namespace.
+- For example, you can only have one Pod named myapp-1234 within the same namespace, but you can have one Pod 
+and one Deployment that are each named myapp-1234.
 
+##### What is object UUID all about?
+- A Kubernetes systems-generated string to uniquely identify objects.
+- Kubernetes UIDs are universally unique identifiers (also known as UUIDs). 
 
+##### When to use multiple namespace?
+![screenshot69](screenshot69.PNG)
 
+##### which command can be used to view all namespaces?
+```
+kubectl get namespace
+```
+- Avoid creating namespace with prefix kube-, since it is reserved for Kubernetes system namespaces.
 
+##### Is there a way to set specific namespace in kubernetes configuration and then all subsequent commands run in same namespace?
+![screenshot70](screenshot70.PNG)
+
+##### How to set namespace while doing CRUD for kubernetes objects?
+Using --namespace flag in request
+
+##### Is it that all kubernetes objects are in namespace?
+![screenshot71](screenshot71.PNG)
+```
+# In a namespace
+kubectl api-resources --namespaced=true
+
+# Not in a namespace
+kubectl api-resources --namespaced=false
+```
+
+##### what is special about labels and when it should be used?
+- Labels are key/value pairs that are attached to objects, such as pods.
+- Labels are intended to be used to specify identifying attributes of objects that are meaningful and relevant to users, 
+but do not directly imply semantics to the core system.
+- Labels can be attached to objects at creation time and subsequently added and modified at any time.
+- Labels allow for efficient queries and watches and are ideal for use in UIs and CLIs. 
+- Non-identifying information should be recorded using annotations.
+
+![screenshot72](screenshot72.PNG)
+
+##### Give some examples of using labels.
+![screenshot73](screenshot73.PNG)
+
+![screenshot74](screenshot74.PNG)
+
+##### when to use annotations vs label while creating objects in kubernetes?
+- You can use Kubernetes annotations to attach arbitrary non-identifying metadata to objects.
+- Clients such as tools and libraries can retrieve this metadata.
+- Labels can be used to select objects and to find collections of objects that satisfy certain conditions. 
+In contrast, annotations are not used to identify and select objects.
+
+![screenshot75](screenshot75.PNG)
+
+##### Give some examples of using annotations.
+![screenshot76](screenshot76.PNG)
+
+![screenshot77](screenshot77.PNG)
 
 
 
