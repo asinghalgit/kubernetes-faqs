@@ -3,6 +3,8 @@
 ##### References
 - https://kubernetes.io/docs/tutorials/kubernetes-basics/create-cluster/cluster-intro/
 - https://kubernetes.io/docs/concepts/overview/components/
+- https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/pod-v1/#PodSpec
+
 
 ##### Why to use Kubernetes?
 With modern web services, users expect applications to be available 24/7, and developers expect to deploy new versions of those applications several times a day. Containerization helps package software to serve these goals, enabling applications to be released and updated without downtime. Kubernetes helps you make sure those containerized applications run where and when you want, and helps them find the resources and tools they need to work. Kubernetes is a production-ready, open source platform designed with Google's accumulated experience in container orchestration, combined with best-of-breed ideas from the community.
@@ -535,7 +537,7 @@ but do not directly imply semantics to the core system.
 - You can use Kubernetes annotations to attach arbitrary non-identifying metadata to objects.
 - Clients such as tools and libraries can retrieve this metadata.
 - Labels can be used to select objects and to find collections of objects that satisfy certain conditions. 
-In contrast, annotations are not used to identify and select objects.
+- In contrast, annotations are not used to identify and select objects.
 
 ![screenshot75](screenshot75.PNG)
 
@@ -544,15 +546,141 @@ In contrast, annotations are not used to identify and select objects.
 
 ![screenshot77](screenshot77.PNG)
 
+##### which are the key points regarding containers?
+- A container image is a ready-to-run software package, containing everything needed to run an application: 
+the code and any runtime it requires, application and system libraries, and default values for any essential settings.
+- By design, a container is immutable: you cannot change the code of a container that is already running. 
+If you have a containerized application and want to make changes, you need to build a new image that includes the change, 
+then recreate the container to start from the updated image.
 
+##### what is container run time?
+- The container runtime is the software that is responsible for running containers.
 
+##### which are the container run times by kubernetes?
+- Docker
+- containerd
+- CRI-O
+- Any implementation of the Kubernetes CRI (Container Runtime Interface)
 
+##### By default, which docker registry will be used by kubernetes to get docker images?
+- If you don't specify a registry hostname, Kubernetes assumes that you mean the Docker public registry.
 
+##### Is there any recommendation with respect to using tag with docker images?
+![screenshot78](screenshot78.PNG)
 
+##### Which kubernetes component is responsible for pulling an image from docker hub?
+kubelet
 
+##### What is the difference between config maps and secrets?
+- There are several ways to set environment variables for a Docker container in Kubernetes, including: Dockerfile, 
+kubernetes.yml, Kubernetes ConfigMaps, and Kubernetes Secrets.
+- One of the benefits for using ConfigMaps and Secrets is that they can be re-used across multiple containers, 
+including being assigned to different environment variables for the different containers.
+- ConfigMaps are API Objects that store non-confidential key-value pairs. for example - to store the application's name
+- Although Secrets are also used to store key-value pairs, they differ from ConfigMaps in that they're intended for 
+confidential/sensitive information and are stored using Base64 encoding. This makes secrets the appropriate choice for 
+storing such things as credentials, keys, and tokens.
 
+##### Which are the key points related to Pod?
+- smallest deployable units of computing that you can create and manage in Kubernetes
+- a group of one or more containers, with shared storage and network resources, and a specification for how to run the containers.
+- A Pod models an application-specific "logical host": it contains one or more application containers which are relatively tightly coupled.
 
+##### Which are the recommendations to create a Pod?
+![screenshot79](screenshot79.PNG)
 
+##### In how many ways, pods in a kubernetes cluster are managed?
+![screenshot80](screenshot80.PNG)
 
+![screenshot82](screenshot82.PNG)
 
+##### How many instances of an application should be executed in a single pod?
+![screenshot81](screenshot81.PNG)
 
+##### Init containers are started before/after application containers?
+- Some Pods have init containers as well as app containers. Init containers run and complete before the app containers are started.
+
+##### Give an example of creating using Job kind.
+![screenshot83](screenshot83.PNG)
+
+##### What will happen if pod template is changed while pod with old template is still running?
+![screenshot84](screenshot84.PNG)
+- when the Pod template for a workload resource is changed, the controller creates new Pods based on the updated template 
+instead of updating or patching the existing Pods.
+
+##### is it that each workload resource uses same strategy to react to pod template change while pod is still running?
+Each workload resource implements its own rules for handling changes to the Pod template.
+
+##### Containers running within same pod contains same/different ip address? Also, conatiners ip addresss diferent from pod ip address?
+- In kubernetes, every pod gets assigned an IP address, and every container in the pod gets assigned that same IP address.
+- you can just use `hostname -i` inside your container to get the pod IP address.
+- kubectl describe pods will give same ip address
+- Within a Pod, containers share an IP address and port space, and can find each other via localhost.
+
+##### Containers running in same pod contains same/different port?
+Different port
+
+##### what will happen if you delete a pod?
+- deleting a pod via `kubectl delete pod [pod-name]` will delete running pod but it will be recreated as it is desired state.
+- delete deployment will automatically delete pod and deployment both.
+
+##### List down some exercises.
+- imperative style of running pods
+```
+kubectl get pods
+kubectl get services
+kubectl get deployments
+kubectl run my-nginx --image=nginx:alpine
+kubectl get pods
+kubectl get services
+kubectl get deployments
+curl localhost
+kubectl port-forward my-nginx 8080:80
+curl localhost
+```
+
+![screenshot85](screenshot85.PNG)
+![screenshot86](screenshot86.PNG)
+
+- declarative style of running pods
+![screenshot87](screenshot87.PNG)
+![screenshot88](screenshot88.PNG)
+![screenshot89](screenshot89.PNG)
+![screenshot90](screenshot90.PNG)
+
+##### what is the best way to write yml files?
+By using kubernetes API reference here at https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/
+
+##### What is probe in the context of pod and containers in kubernetes?
+- kubernetes relies on Probes to determine health ofa pod container.
+- A probe is a diagnostic performed periodically by the kubelet on a container.
+- two types of probes 1) liveness probe 2) readiness probe
+
+##### What is liveness probe in the context of pod and containers in kubernetes?
+Liveness probe is used to determine if a Pod is healthy and running as expected
+
+##### What is readiness probe in the context of pod and containers in kubernetes?
+Readiness probe is used to determine if a Pod should receive request
+
+##### Give an example of using liveness probe.
+![screenshot91](screenshot91.PNG)
+
+![screenshot92](screenshot92.PNG)
+
+![screenshot93](screenshot93.PNG)
+
+- define yaml file with liveness probe
+- create pod with above yaml file
+- at this point pod will be running fine
+- go to pod and remove index.html file
+- probe will fail this time
+- container will be restarted
+
+![screenshot94](screenshot94.PNG)
+![screenshot95](screenshot95.PNG)
+![screenshot96](screenshot96.PNG)
+![screenshot97](screenshot97.PNG)
+![screenshot98](screenshot98.PNG)
+![screenshot99](screenshot99.PNG)
+
+##### Give an example of using liveness probe.
