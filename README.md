@@ -772,3 +772,36 @@ No, only pod will be created. Also, if pod goes down then it will not be restart
 ##### Give some explanation around `ExternalName` service type.
 ![screenshot132](screenshot132.PNG)
 
+##### How do you exchange application state/data and exchange it between pods in Kubernetes?
+- Via Volumes
+- A volume can be used to store data and state for pods and containers.
+
+![screenshot142](screenshot142.PNG)
+
+![screenshot143](screenshot143.PNG)
+
+![screenshot144](screenshot144.PNG)
+
+##### List down some exercises around volumes.
+
+1)
+![screenshot145](screenshot145.PNG)
+![screenshot146](screenshot146.PNG)
+![screenshot147](screenshot147.PNG)
+
+2)
+![screenshot150](screenshot150.PNG)
+![screenshot151](screenshot151.PNG)
+
+##### Which are config maps and how to use them?
+- it provides a way to store configuration information and provide it to containers
+- 
+![screenshot152](screenshot152.PNG)
+![screenshot153](screenshot153.PNG)
+![screenshot154](screenshot154.PNG)
+![screenshot155](screenshot155.PNG)
+
+##### List down some exercises around configMap.
+
+
+

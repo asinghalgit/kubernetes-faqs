@@ -22,3 +22,6 @@ spec:
     app: greeting
   ports:
     - port: 8086
+
+---
+
