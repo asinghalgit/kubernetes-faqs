@@ -648,6 +648,44 @@ curl localhost
 ![screenshot89](screenshot89.PNG)
 ![screenshot90](screenshot90.PNG)
 
+- create deployment via yml file 
+- please note that when deployment is created via yaml file then deployment, replica set and pod (all 3 resource type) will be created.
+
+![screenshot111](screenshot111.PNG)
+![screenshot113](screenshot113.PNG)
+![screenshot112](screenshot112.PNG)
+![screenshot114](screenshot114.PNG)
+![screenshot115](screenshot115.PNG)
+![screenshot116](screenshot116.PNG)
+
+- please note that you can always use `apply` command for incremental changes after changing yml file.
+
+![screenshot117](screenshot117.PNG)
+![screenshot118](screenshot118.PNG)
+![screenshot119](screenshot119.PNG)
+![screenshot120](screenshot120.PNG)
+![screenshot121](screenshot121.PNG)
+![screenshot122](screenshot122.PNG)
+![screenshot123](screenshot123.PNG)
+
+- declarative style of creating `ClusterIP` service type (default service type)
+1) 2 different spring boot applications - each exposed 1 end point /greeting and /hello
+2) 2 services for each end point/pod
+3) 1 pod (via its service) can talk to another pod (via its service) 
+4) pod/service can not be accessed outside kubernetes cluster
+
+![screenshot133](screenshot133.PNG)
+![screenshot134](screenshot134.PNG)
+![screenshot135](screenshot135.PNG)
+![screenshot136](screenshot136.PNG)
+![screenshot137](screenshot137.PNG)
+![screenshot138](screenshot138.PNG)
+![screenshot139](screenshot139.PNG)
+
+- declarative style of creating `NodePort` service type (default service type)
+![screenshot140](screenshot140.PNG)
+![screenshot141](screenshot141.PNG)
+
 ##### what is the best way to write yml files?
 By using kubernetes API reference here at https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.21/
 
@@ -657,10 +695,14 @@ By using kubernetes API reference here at https://kubernetes.io/docs/reference/g
 - two types of probes 1) liveness probe 2) readiness probe
 
 ##### What is liveness probe in the context of pod and containers in kubernetes?
-Liveness probe is used to determine if a Pod is healthy and running as expected
+Liveness probe is used to determine if a Pod is healthy and running as expected.
+if access to endpoint defined during liveness check fails then container will be restarted and not the pod.
+so in real time projects, we could define end point which checks state of health and provide the same in liveness. 
+If application goes down then it will be restarted by kubernetes cluster.
 
 ##### What is readiness probe in the context of pod and containers in kubernetes?
-Readiness probe is used to determine if a Pod should receive request
+Readiness probe is used to determine if a Pod should receive request.
+If Readiness probe fails then pod and container status will not change but desired state and current state will differ.
 
 ##### Give an example of using liveness probe.
 ![screenshot91](screenshot91.PNG)
@@ -671,10 +713,10 @@ Readiness probe is used to determine if a Pod should receive request
 
 - define yaml file with liveness probe
 - create pod with above yaml file
-- at this point pod will be running fine
-- go to pod and remove index.html file
+- at this point pod and container inside pod will be running fine
+- go inside pod and remove index.html file
 - probe will fail this time
-- container will be restarted
+- container will be restarted without restarting pod.
 
 ![screenshot94](screenshot94.PNG)
 ![screenshot95](screenshot95.PNG)
@@ -683,4 +725,50 @@ Readiness probe is used to determine if a Pod should receive request
 ![screenshot98](screenshot98.PNG)
 ![screenshot99](screenshot99.PNG)
 
-##### Give an example of using liveness probe.
+##### Give an example of using readiness probe.
+![screenshot100](screenshot100.PNG)
+![screenshot101](screenshot101.PNG)
+![screenshot102](screenshot102.PNG)
+![screenshot103](screenshot103.PNG)
+![screenshot104](screenshot104.PNG)
+![screenshot105](screenshot105.PNG)
+![screenshot106](screenshot106.PNG)
+
+##### Which are the important points around liveness and readiness probe.
+![screenshot107](screenshot107.PNG)
+
+![screenshot108](screenshot108.PNG)
+
+##### If we directly create pod via yaml file then will deployment be created as well by default?
+No, only pod will be created. Also, if pod goes down then it will not be restarted as there is no deployment and replica
+ set to take care of the same.
+ 
+##### What is the difference between `create` and `apply` commands in kubernetes?
+![screenshot109](screenshot109.PNG)
+![screenshot110](screenshot110.PNG)
+
+##### Why there is need for services?
+![screenshot124](screenshot124.PNG)
+
+![screenshot125](screenshot125.PNG)
+
+![screenshot126](screenshot126.PNG)
+
+![screenshot127](screenshot127.PNG)
+
+##### Which are the different service types?
+
+![screenshot128](screenshot128.PNG)
+
+##### Give some explanation around `ClusterIP` service type.
+![screenshot129](screenshot129.PNG)
+
+##### Give some explanation around `NodePort` service type.
+![screenshot130](screenshot130.PNG)
+
+##### Give some explanation around `LoadBalancer` service type.
+![screenshot131](screenshot131.PNG)
+
+##### Give some explanation around `ExternalName` service type.
+![screenshot132](screenshot132.PNG)
+
